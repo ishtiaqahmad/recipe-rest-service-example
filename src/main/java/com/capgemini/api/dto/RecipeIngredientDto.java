@@ -13,10 +13,13 @@ public class RecipeIngredientDto {
     @NotNull(message = "quantity can not be null!")
     private Double quantity; // in grams
 
-    public RecipeIngredientDto(long id, String name, Double quantity) {
-        this.id = id;
+    public RecipeIngredientDto(String name, Double quantity) {
         this.name = name;
         this.quantity = quantity;
+    }
+    public RecipeIngredientDto(long id, String name, Double quantity) {
+        this(name,quantity);
+        this.id = id;
     }
 
     public long getId() {
