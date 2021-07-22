@@ -1,7 +1,6 @@
 package com.capgemini.api.controller;
 
 import com.capgemini.api.dto.RecipeDto;
-import com.capgemini.exception.NotImplementedException;
 import com.capgemini.exception.RecipeNotFoundException;
 import com.capgemini.persistence.model.Recipe;
 import com.capgemini.service.RecipeService;
@@ -48,14 +47,14 @@ public class ApiController {
 
     @GetMapping(value = "/recipes/{id}")
     public ResponseEntity<RecipeDto> getRecipe(@PathVariable("id") Long id) throws ResourceNotFoundException {
-        Recipe recipe = recipeService.getRecipe(id).orElseThrow(() -> new ResourceNotFoundException("Recipe Not found with id = " + id));
+        Recipe recipe = recipeService.getRecipe(id).orElseThrow(() -> new RecipeNotFoundException("Recipe Not found with id = " + id));
         RecipeDto recipeDto = modelMapper.map(recipe, RecipeDto.class);
         return new ResponseEntity<>(recipeDto, HttpStatus.OK);
     }
 
     @PutMapping(value = "/recipes/{id}")
     public ResponseEntity<HttpStatus> updateRecipe(@PathVariable("id") Long id, @RequestBody RecipeDto recipeDto) {
-        recipeService.getRecipe(id).orElseThrow(() -> new ResourceNotFoundException("Recipe Not found for update with id = " + id));
+        recipeService.getRecipe(id).orElseThrow(() -> new RecipeNotFoundException("Recipe Not found for update with id = " + id));
         Recipe recipe = modelMapper.map(recipeDto, Recipe.class);
         recipeService.updateRecipe(recipe);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -63,7 +62,11 @@ public class ApiController {
 
     @DeleteMapping("/recipes/{id}")
     public ResponseEntity<HttpStatus> deleteRecipe(@PathVariable("id") long id) {
-        recipeService.deleteRecipe(id);
+        try {
+            recipeService.deleteRecipe(id);
+        }catch (Exception exp){
+            throw new RecipeNotFoundException("Delete Recipe id = " + id);
+        }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
